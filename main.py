@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 from typing import List
+import os
 
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +16,19 @@ app = FastAPI(
     title="NeoControle Auth Backend",
     description="Serviço de autenticação central para NeoControle/NeoPDV",
     version="0.1.0",
+)
+
+# CORS para permitir o frontend acessar este backend
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://neocontrole.vercel.app",
+  ],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
 )
 
 
@@ -94,3 +109,10 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
 @app.get("/")
 async def root():
     return {"message": "NeoControle Auth Backend running"}
+
+
+if __name__ == "__main__":
+  import uvicorn
+
+  port = int(os.getenv("PORT", "8000"))
+  uvicorn.run("main:app", host="0.0.0.0", port=port)
