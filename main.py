@@ -89,6 +89,7 @@ async def on_startup() -> None:
         Establishment(id="neopdv2", nome="NeoPDV 2", url_front="https://neopdv2.vercel.app"),
         Establishment(id="neopdv3", nome="NeoPDV 3", url_front="https://neopdv3.vercel.app"),
         Establishment(id="neopdv4", nome="NeoPDV 4", url_front="https://neopdv4.vercel.app"),
+        Establishment(id="neopdv5", nome="NeoPDV 5", url_front="https://neopdv5.vercel.app"),
       ]
       session.add_all(defaults)
 
@@ -128,6 +129,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
         Estabelecimento(id="neopdv2", nome="NeoPDV 2", url_front="https://neopdv2.vercel.app"),
         Estabelecimento(id="neopdv3", nome="NeoPDV 3", url_front="https://neopdv3.vercel.app"),
         Estabelecimento(id="neopdv4", nome="NeoPDV 4", url_front="https://neopdv4.vercel.app"),
+        Estabelecimento(id="neopdv5", nome="NeoPDV 5", url_front="https://neopdv5.vercel.app"),
       ]
 
     return LoginResponse(
