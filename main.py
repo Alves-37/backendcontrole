@@ -52,6 +52,11 @@ class LoginResponse(BaseModel):
     estabelecimentos: List[Estabelecimento]
 
 
+class UserUpdate(BaseModel):
+    nome: str | None = None
+    password: str | None = None
+
+
 @app.on_event("startup")
 async def on_startup() -> None:
   """Garantir tabelas e dados padrão (usuários e estabelecimentos)."""
@@ -149,6 +154,29 @@ async def atualizar_estabelecimento(estab_id: str, data: EstabelecimentoUpdate, 
     await db.refresh(est)
 
     return Estabelecimento(id=est.id, nome=est.nome, url_front=est.url_front)
+
+
+@app.put("/users/{username}")
+async def atualizar_usuario(username: str, data: UserUpdate, db: AsyncSession = Depends(get_db)):
+    """Atualiza nome e/ou senha de um usuário do auth (sem autenticação forte por enquanto)."""
+    result = await db.execute(select(User).where(User.username == username))
+    user: User | None = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    if data.nome is not None and data.nome.strip():
+        user.nome = data.nome.strip()
+    if data.password is not None and data.password.strip():
+        # Por enquanto senha em texto simples; depois trocar para hash
+        user.password = data.password
+
+    await db.commit()
+
+    return {
+        "username": user.username,
+        "nome": user.nome,
+        "is_active": user.is_active,
+    }
 
 
 @app.get("/")
