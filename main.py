@@ -144,6 +144,34 @@ class EstabelecimentoUpdate(BaseModel):
     nome: str
 
 
+@app.get("/estabelecimentos", response_model=List[Estabelecimento])
+async def listar_estabelecimentos(db: AsyncSession = Depends(get_db)):
+    """Retorna a lista de todos os estabelecimentos do banco de dados."""
+    result = await db.execute(select(Establishment))
+    estabs_db = result.scalars().all()
+    
+    if estabs_db:
+        estabelecimentos = [
+            Estabelecimento(
+                id=e.id,
+                nome=e.nome,
+                url_front=e.url_front,
+            )
+            for e in estabs_db
+        ]
+    else:
+        # Fallback em caso de banco vazio
+        estabelecimentos = [
+            Estabelecimento(id="neopdv1", nome="NeoPDV 1", url_front="https://neopdv1.vercel.app"),
+            Estabelecimento(id="neopdv2", nome="NeoPDV 2", url_front="https://neopdv2.vercel.app"),
+            Estabelecimento(id="neopdv3", nome="NeoPDV 3", url_front="https://neopdv3.vercel.app"),
+            Estabelecimento(id="neopdv4", nome="NeoPDV 4", url_front="https://neopdv4.vercel.app"),
+            Estabelecimento(id="neopdv5", nome="NeoPDV 5", url_front="https://neopdv5.vercel.app"),
+        ]
+    
+    return estabelecimentos
+
+
 @app.put("/estabelecimentos/{estab_id}", response_model=Estabelecimento)
 async def atualizar_estabelecimento(estab_id: str, data: EstabelecimentoUpdate, db: AsyncSession = Depends(get_db)):
     # Atualiza apenas o nome do estabelecimento no banco
